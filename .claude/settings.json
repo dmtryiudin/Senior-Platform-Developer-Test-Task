@@ -1,0 +1,30 @@
+{
+  "enabledMcpjsonServers": ["playwright", "context7"],
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck)",
+      "Bash(npx prettier --check:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker compose logs:*)",
+      "Bash(curl -sf localhost:*)",
+      "Bash(docker compose exec -T postgres psql:*)",
+      "Bash(npx shadcn@latest info:*)",
+      "mcp__playwright",
+      "mcp__context7"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/format.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

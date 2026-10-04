@@ -1,0 +1,82 @@
+# The only way to run the project: npm run dev:docker (docker compose up --build --watch)
+# - src/ dirs are bind-mounted: changes hot-reload instantly (nest --watch / next dev).
+# - Other app files are handled by Compose Watch: config changes restart the service,
+#   dependency changes rebuild the image.
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    build: .
+    command: npm run dev -w backend
+    environment:
+      PORT: ${PORT:-3001}
+      DATABASE_URL: postgres://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@postgres:5432/${POSTGRES_DB:-app}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
+    ports:
+      - '${PORT:-3001}:${PORT:-3001}'
+    volumes:
+      - ./backend/src:/app/backend/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ./backend/tsconfig.json
+          target: /app/backend/tsconfig.json
+          action: sync+restart
+        - path: ./backend/tsconfig.build.json
+          target: /app/backend/tsconfig.build.json
+          action: sync+restart
+        - path: ./backend/nest-cli.json
+          target: /app/backend/nest-cli.json
+          action: sync+restart
+        - path: ./backend/package.json
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
+
+  frontend:
+    build: .
+    command: npm run dev -w frontend
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      API_INTERNAL_URL: http://backend:${PORT:-3001}
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/app/frontend/src
+    depends_on:
+      - backend
+    develop:
+      watch:
+        - path: ./frontend/next.config.ts
+          target: /app/frontend/next.config.ts
+          action: sync+restart
+        - path: ./frontend/tsconfig.json
+          target: /app/frontend/tsconfig.json
+          action: sync+restart
+        - path: ./frontend/postcss.config.mjs
+          target: /app/frontend/postcss.config.mjs
+          action: sync+restart
+        - path: ./frontend/package.json
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
+
+volumes:
+  postgres-data:

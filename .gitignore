@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.next/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.DS_Store
+npm-debug.log*
+frontend/next-env.d.ts
+.claude/settings.local.json
+.playwright-mcp/

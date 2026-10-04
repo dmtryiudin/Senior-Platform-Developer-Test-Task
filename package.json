@@ -1,0 +1,26 @@
+{
+  "name": "test-task",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev:docker": "docker compose up --build --watch",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "typescript-eslint": "^8.71.0"
+  }
+}

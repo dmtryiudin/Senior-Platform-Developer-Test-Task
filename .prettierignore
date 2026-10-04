@@ -1,0 +1,8 @@
+node_modules
+dist
+.next
+package-lock.json
+frontend/next-env.d.ts
+.claude/skills/shadcn
+.claude/skills/vercel-react-best-practices
+skills-lock.json

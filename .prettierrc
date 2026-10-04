@@ -1,0 +1,7 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindStylesheet": "./frontend/src/app/globals.css",
+  "tailwindFunctions": ["cn", "cva"]
+}
