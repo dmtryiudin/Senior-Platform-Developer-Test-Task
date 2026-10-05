@@ -4,7 +4,10 @@ import {
   HealthCheckService,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
+import { Public } from '../auth/public.decorator.js';
 
+// Public: used by Docker, the verify skill and the frontend without a token.
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(

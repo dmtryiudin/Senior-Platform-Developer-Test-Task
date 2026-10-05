@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module.js';
 import { EnvironmentVariables, validate } from './config/env.validation.js';
 import { HealthModule } from './health/health.module.js';
+import { SeedModule } from './seed/seed.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { HealthModule } from './health/health.module.js';
       }),
     }),
     HealthModule,
+    UsersModule,
+    AuthModule,
+    SeedModule,
   ],
 })
 export class AppModule {}

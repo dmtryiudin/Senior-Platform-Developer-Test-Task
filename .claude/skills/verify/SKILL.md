@@ -35,12 +35,20 @@ After dependency changes (`package.json` / `package-lock.json`), Compose Watch r
 ## 3. Backend changes
 
 - `curl` every affected endpoint: the happy path plus at least one invalid input (expect a 400 from the global `ValidationPipe`, not a 500).
+- Every endpoint except `@Public()` ones needs a token. Log in as a seed user (credentials in `backend/src/seed/seed-users.ts`) and pass the `accessToken`; also check that the endpoint answers 401 without it:
+
+  ```bash
+  curl -sf localhost:3001/api/auth/login -H 'content-type: application/json' \
+    -d '{"email":"iris.novak@example.com","password":"VWYo-LW67-y5DM"}'
+  curl -sf localhost:3001/api/auth/me -H 'Authorization: Bearer <accessToken>'
+  ```
+
 - If the backend doesn't start after an env change, check the logs for `Invalid environment variables`.
 - Check `docker compose logs backend --tail 50` for errors.
 
 ## 4. Frontend changes
 
-- Use the Playwright MCP: open the affected page at `http://localhost:3000`, walk through the user flow (click, fill in forms, submit), and confirm the result is visible on the page.
+- Use the Playwright MCP: open the affected page at `http://localhost:3000`, walk through the user flow (click, fill in forms, submit), and confirm the result is visible on the page. Every page except `/login` requires a session, so log in through the form with a seed user first.
 - Check the browser console messages for errors.
 - Check `docker compose logs frontend --tail 50` for server-side errors.
 
@@ -52,6 +60,8 @@ Inspect the schema or data directly:
 docker compose exec -T postgres psql -U app -d app -c '\dt'
 docker compose exec -T postgres psql -U app -d app -c 'SELECT * FROM <table> LIMIT 5'
 ```
+
+Tables are plural (`users`); never query `user`, which is a reserved word in Postgres and returns the DB role.
 
 ## 6. Clean up
 

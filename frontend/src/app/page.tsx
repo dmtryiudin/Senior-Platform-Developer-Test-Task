@@ -1,46 +1,26 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { logout } from '@/app/actions/auth';
+import { HealthStatus } from '@/components/health-status';
 import { Button } from '@/components/ui/button';
-import { ApiError, apiFetch } from '@/lib/api';
+import { getCurrentUser } from '@/lib/dal';
 
-// Terminus health response (only the fields used here).
-type Health = {
-  status: string;
-  info?: { database?: { status: string } };
-};
-
-async function fetchHealth(): Promise<string> {
-  try {
-    const health = await apiFetch<Health>('/api/health');
-    return `api: ${health.status}, db: ${health.info?.database?.status ?? 'unknown'}`;
-  } catch (error) {
-    return error instanceof ApiError
-      ? `error ${error.status}: ${error.message}`
-      : 'unreachable';
-  }
-}
-
-export default function Home() {
-  const [status, setStatus] = useState('checking...');
-
-  useEffect(() => {
-    // fetchHealth never rejects, so the promise is safe to leave unawaited.
-    void fetchHealth().then(setStatus);
-  }, []);
-
-  const recheck = () => {
-    setStatus('checking...');
-    void fetchHealth().then(setStatus);
-  };
+export default async function Home() {
+  // Verifies the session with the backend; redirects to /login if it's gone or invalid.
+  const user = await getCurrentUser();
 
   return (
-    <main className="mx-auto flex max-w-xl flex-col gap-4 p-8">
-      <h1 className="text-2xl font-semibold">Test Task</h1>
-      <p className="text-muted-foreground">Backend status: {status}</p>
-      <Button className="self-start" onClick={recheck}>
-        Check again
-      </Button>
+    <main className="mx-auto flex max-w-xl flex-col gap-6 p-8">
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold">Test Task</h1>
+        <form action={logout}>
+          <Button type="submit" variant="outline">
+            Log out
+          </Button>
+        </form>
+      </div>
+      <p>
+        Signed in as <span className="font-medium">{user.email}</span>
+      </p>
+      <HealthStatus />
     </main>
   );
 }

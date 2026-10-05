@@ -18,6 +18,10 @@ Without Node/npm, run the same command directly: `docker compose up --build --wa
 
 Changes to source files, configs and dependencies are picked up automatically (hot reload, restart or rebuild as needed).
 
+### Log in
+
+There's no sign-up. On first start, an empty database is seeded with three users. Their emails and passwords are in [`backend/src/seed/seed-users.ts`](backend/src/seed/seed-users.ts). To reset the database and re-seed, run `docker compose down -v`.
+
 ## Tooling
 
 Requires Node 24 (`nvm use`).
@@ -29,4 +33,4 @@ npm run typecheck
 npm run format
 ```
 
-Optional: copy `.env.example` to `.env` to override ports/URLs.
+Optional: copy `.env.example` to `.env` to override settings: ports and URLs, the JWT secret and token lifetime, and the Postgres credentials.
